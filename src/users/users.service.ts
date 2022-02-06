@@ -1,21 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import {User} from "./entities/user.entity";
-import {CreateUserDto} from "./dto/create-user.dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
+import {Auth} from "../auth/entities/auth.entity";
 
 @Injectable()
 export class UsersService {
 constructor(
-    @InjectRepository(User)
-    private readonly userRepository:Repository<User>
+    @InjectRepository(Auth)
+    private readonly authRepository:Repository<Auth>
 ) {
 }
-    private users:CreateUserDto[] = [{createdAt:'2022:01:02',email:'kami@hmail.com',updatedAt:"2022:02:02",hash:"sadsdfsdfe^%&%67ddf7s7"}]
-
-    // create(createUserDto:CreateUserDto){
-    // const user = this.userRepository.create(createUserDto)
-    // return this.userRepository.save(user)
+    // async create(data){
+    //     console.log('DATAAaa', data);
+    //     return this.authRepository.save(data)
     // }
 
 }

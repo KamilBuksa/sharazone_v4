@@ -6,16 +6,20 @@ import {User} from "../users/entities/user.entity";
 import {Repository} from "typeorm";
 import {AuthService} from "./auth.service";
 import {AuthDto} from "./dto";
+import {Tokens} from "./types";
 
 @Controller('auth')
 export class AuthController {
     constructor(
-        private authService:AuthService
-    ) {}
+        private authService: AuthService
+    ) {
+    }
 
     @Post('/local/signup')
-    signupLocal(@Body() dto:AuthDto) {
-        return this.authService.signupLocal(dto)
+    signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
+        return this.authService.signupLocal(dto);
+
+
     }
 
     @Post('/local/signin')
@@ -32,7 +36,6 @@ export class AuthController {
     refreshToken() {
         this.authService.refreshToken()
     }
-
 
 
 }
