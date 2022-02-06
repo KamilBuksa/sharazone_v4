@@ -1,18 +1,24 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {IsDate, IsString} from "class-validator";
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn({type:'bigint'})
-    id?: number;
+    @PrimaryGeneratedColumn({type: 'bigint'})
+    id: number;
 
-    @Column(
-        {type:'bigint', nullable:true})
-    userId:  number;
+    @Column({nullable:true, type:"date"})
+    createdAt: string
 
-    @Column(/*{type:"varchar"}*/)
-    readonly username: string;
+    @Column({nullable:true, type:"date"})
+    updatedAt: string
 
-    @Column()
-    readonly password: string;
+    @Column({nullable:true})
+    email: string
+
+    @Column({nullable:true})
+    hash: string
+
+    @Column({nullable:true})
+    hashedRt?: string
 
 }

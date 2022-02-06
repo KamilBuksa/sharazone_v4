@@ -4,24 +4,35 @@ import {UsersService} from "../users/users.service";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../users/entities/user.entity";
 import {Repository} from "typeorm";
+import {AuthService} from "./auth.service";
+import {AuthDto} from "./dto";
 
 @Controller('auth')
 export class AuthController {
     constructor(
-        private readonly userService:UsersService
-    ) {
+        private authService:AuthService
+    ) {}
+
+    @Post('/local/signup')
+    signupLocal(@Body() dto:AuthDto) {
+        return this.authService.signupLocal(dto)
     }
 
-@Get('hello')
-hello(){
-    console.log('hello')
-    return 'hello'
-}
+    @Post('/local/signin')
+    signinLocal() {
+        this.authService.signinLocal()
+    }
 
-@Post()
-    sendDate(@Body() createUserDto:CreateUserDto){
-   return this.userService.create(createUserDto)
+    @Post('/logout')
+    logout() {
+        this.authService.logout()
+    }
 
-}
+    @Post('/refresh')
+    refreshToken() {
+        this.authService.refreshToken()
+    }
+
+
 
 }

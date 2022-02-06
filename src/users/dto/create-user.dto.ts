@@ -1,16 +1,24 @@
-import { IsNumber, IsString } from "class-validator";
-export type OmitPassword= Omit<CreateUserDto, "password">
-export type OmitUserId= Omit<CreateUserDto, "userId">
+import {IsDate, IsNumber, IsString} from "class-validator";
+
+export type OmitPassword = Omit<CreateUserDto, "password">
+export type OmitUserId = Omit<CreateUserDto, "userId">
 
 export class CreateUserDto {
 
-    @IsNumber()
-    userId:  number;
-
+    @IsString()
+    createdAt: string
 
     @IsString()
-    username: string;
+    updatedAt?:string
 
     @IsString()
-    password: string;
+    email: string
+
+    @IsString()
+    hash:string
+
+    @IsString()
+    hashedRt?:string
+
+
 }
