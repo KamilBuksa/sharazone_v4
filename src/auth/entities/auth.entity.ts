@@ -6,12 +6,15 @@ export class Auth {
     @PrimaryGeneratedColumn({type: 'bigint'})
     id: number;
 
+    @CreateDateColumn({type: "timestamp", default:() => "CURRENT_TIMESTAMP(6)"})
+    createdAt: Date
+
+    @UpdateDateColumn({type:"timestamp", default:()=>"CURRENT_TIMESTAMP(6)", onUpdate:"CURRENT_TIMESTAMP(6)"})
+    updatedAt:Date
+
+    @Index('email')
     @Column({unique: true})
     email: string;
-
-    // @Index()
-    // @Column(/*{unique:true}*/)
-    // password: string;
 
     @Column({nullable: true})
     hash: string
@@ -19,10 +22,6 @@ export class Auth {
     @Column({nullable: true})
     hashedRt?: string
 
-    @CreateDateColumn({type: "timestamp", default:() => "CURRENT_TIMESTAMP(6)"})
-    createdAt: Date
 
-    @UpdateDateColumn({type:"timestamp", default:()=>"CURRENT_TIMESTAMP(6)", onUpdate:"CURRENT_TIMESTAMP(6)"})
-    updatedAt:Date
 
 }

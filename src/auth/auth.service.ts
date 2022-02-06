@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {ForbiddenException, Injectable} from '@nestjs/common';
 import {AuthDto} from "./dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Auth} from "./entities/auth.entity";
@@ -22,13 +22,28 @@ export class AuthService {
             email: dto.email,
             hash
         })
-
-
         const tokens = await this.geTokens(newUser.id, newUser.email);
         await this.updateRtHash(newUser.id, tokens.refresh_token)
+
+
         return tokens
     }
-    signinLocal() {
+    async signinLocal(dto:AuthDto): Promise<Tokens>  {
+        const data = await this.authRepository.createQueryBuilder().where({email:dto.email});
+        const userEmail =  data.expressionMap.parameters.orm_param_0;
+
+        const user = await this.authRepository.findOne({email:userEmail});
+        if(!user) throw new ForbiddenException("Access Denied!");
+
+        const passwordMatches = await bcrypt.compare(dto.password, user.hash);
+        if(!passwordMatches) throw new ForbiddenException("Access Denied!");
+
+        const tokens = await this.geTokens(user.id, user.email);
+        await this.updateRtHash(user.id, tokens.refresh_token)
+
+
+        return tokens
+
     }
 
     logout() {
@@ -45,7 +60,6 @@ export class AuthService {
             .set({hashedRt: rt})
             .where({id: userId})
             .execute()
-
     }
 
     hashData(data: string) {
