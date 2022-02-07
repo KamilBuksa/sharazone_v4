@@ -2,8 +2,8 @@ import {ForbiddenException, Injectable} from '@nestjs/common';
 import {AuthDto} from "./dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Auth} from "./entities/auth.entity";
+import * as argon from 'argon2';
 import {Repository} from "typeorm";
-import * as bcrypt from "bcrypt";
 import {Tokens} from "./types";
 import {JwtService} from "@nestjs/jwt";
 
@@ -17,7 +17,7 @@ export class AuthService {
     }
 
     async signupLocal(dto: AuthDto): Promise<Tokens> {
-        const hash = await this.hashData(dto.password)
+        const hash = await argon.hash(dto.password)
         const newUser = await this.authRepository.save({
             email: dto.email,
             hash
@@ -28,35 +28,36 @@ export class AuthService {
 
         return tokens
     }
-    async signinLocal(dto:AuthDto): Promise<Tokens>  {
-        const data = await this.authRepository.createQueryBuilder().where({email:dto.email});
-        const userEmail =  data.expressionMap.parameters.orm_param_0;
 
-        const user = await this.authRepository.findOne({email:userEmail});
-        if(!user) throw new ForbiddenException("Access Denied!");
+    async signinLocal(dto: AuthDto): Promise<Tokens> {
+        const data = await this.authRepository.createQueryBuilder().where({email: dto.email});
+        const userEmail = data.expressionMap.parameters.orm_param_0;
 
-        const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-        if(!passwordMatches) throw new ForbiddenException("Access Denied!");
+        const user = await this.authRepository.findOne({email: userEmail});
+        if (!user) throw new ForbiddenException("Access Denied!");
+
+        const passwordMatches = await argon.verify(user.hash, dto.password);
+        if (!passwordMatches) throw new ForbiddenException("Access Denied!");
 
         const tokens = await this.geTokens(user.id, user.email);
-        await this.updateRtHash(user.id, tokens.refresh_token)
+        await this.updateRtHash(user.id, tokens.refresh_token);
 
 
         return tokens
 
     }
 
-   async logout(userId:number) {
+    async logout(userId: number): Promise<boolean> {
         await this.authRepository.createQueryBuilder()
             .update()
-            .set({hashedRt:null})
+            .set({hashedRt: null})
             .where({
-                id:userId,
-                hashedRt: {not:null}
+                id: userId,
+                hashedRt: {not: null}
             })
             .execute()
 
-       return true
+        return true
     }
 
     refreshToken() {
@@ -64,7 +65,7 @@ export class AuthService {
 
 
     async updateRtHash(userId: number, rt: string) {
-        const hash = await this.hashData(rt)
+        const hash = await argon.hash(rt)
         await this.authRepository.createQueryBuilder()
             .update()
             .set({hashedRt: hash})
@@ -72,9 +73,6 @@ export class AuthService {
             .execute()
     }
 
-    hashData(data: string) {
-        return bcrypt.hash(data, 10)
-    }
 
     async geTokens(userId: number, email: string): Promise<Tokens> {
         const [at, rt] = await Promise.all([
@@ -100,6 +98,7 @@ export class AuthService {
             refresh_token: rt
         }
     }
+
 
 
 }

@@ -1,31 +1,30 @@
 import {
     Body,
-    Controller,
-    createParamDecorator,
-    ExecutionContext,
-    Get,
+    Controller, Delete,
     HttpCode,
-    HttpStatus, Inject, Injectable,
+    HttpStatus,
     Post,
-    Req, Scope,
-    UseGuards, UsePipes, ValidationPipe
+    Req,
+    UseGuards,
 } from '@nestjs/common';
-import {CreateUserDto} from "../users/dto/create-user.dto";
-import {UsersService} from "../users/users.service";
+
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/entities/user.entity";
+
 import {Repository} from "typeorm";
 import {AuthService} from "./auth.service";
 import {AuthDto} from "./dto";
 import {Tokens} from "./types";
-import {AuthGuard, PassportModule} from "@nestjs/passport";
-import {REQUEST} from "@nestjs/core";
-import {Request} from "express";
+import {AuthGuard} from "@nestjs/passport";
+import  {Request} from "express";
+import {Auth} from "./entities/auth.entity";
+
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private authService: AuthService,
+        @InjectRepository(Auth)
+        private readonly authRepository: Repository<Auth>,
     ) {
     }
 
@@ -47,11 +46,11 @@ export class AuthController {
     @UseGuards(AuthGuard('jwt'))
     @Post('logout')
     @HttpCode(HttpStatus.OK)
-    async logout( @Req() req:Request) {
-        const user = req.user['sub'];
-        return await this.authService.logout(user)
-    }
+    async logout(@Req() req: Request) {
 
+        // const user = req.user
+        // return await this.authService.logout(user['sub'])
+    }
 
 
     @UseGuards(AuthGuard('jwt-refresh'))

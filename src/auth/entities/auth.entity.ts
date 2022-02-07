@@ -20,7 +20,7 @@ export class Auth {
     hash: string
 
     @Column({nullable: true})
-    hashedRt?: string
+    hashedRt: string
 
 
 
