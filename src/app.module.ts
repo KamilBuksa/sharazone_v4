@@ -5,6 +5,7 @@ import {AuthModule} from './auth/auth.module';
 import {UsersModule} from './users/users.module';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
+import {AtStrategy, RtStrategy} from "./auth/strategies";
 
 
 @Module({
@@ -28,7 +29,7 @@ import appConfig from './config/app.config';
         AuthModule,
         UsersModule],
     controllers: [],
-    providers: [],
+    providers: [AtStrategy,RtStrategy],
 })
 export class AppModule {
 }
