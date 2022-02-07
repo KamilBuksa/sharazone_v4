@@ -3,7 +3,7 @@ import {ArticlesModule} from './articles/articles.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from './auth/auth.module';
 import {UsersModule} from './users/users.module';
-import {ConfigModule} from "@nestjs/config";
+import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
 
 
@@ -13,7 +13,7 @@ import appConfig from './config/app.config';
             load: [appConfig], // 👈
         }),
         TypeOrmModule.forRootAsync({ // 👈
-            useFactory: () => ({
+            useFactory: (configService: ConfigService) => ({
                 type: 'postgres',
                 host: process.env.DATABASE_HOST,
                 port: +process.env.DATABASE_PORT,

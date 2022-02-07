@@ -1,5 +1,4 @@
-import {IsDate, IsEmail, IsNotEmpty, IsString} from "class-validator";
-import {Unique} from "typeorm";
+import { IsNotEmpty, IsString} from "class-validator";
 
 export class AuthDto {
     @IsNotEmpty()

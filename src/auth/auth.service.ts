@@ -46,7 +46,17 @@ export class AuthService {
 
     }
 
-    logout() {
+   async logout(userId:number) {
+        await this.authRepository.createQueryBuilder()
+            .update()
+            .set({hashedRt:null})
+            .where({
+                id:userId,
+                hashedRt: {not:null}
+            })
+            .execute()
+
+       return true
     }
 
     refreshToken() {
@@ -57,7 +67,7 @@ export class AuthService {
         const hash = await this.hashData(rt)
         await this.authRepository.createQueryBuilder()
             .update()
-            .set({hashedRt: rt})
+            .set({hashedRt: hash})
             .where({id: userId})
             .execute()
     }
