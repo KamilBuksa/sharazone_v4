@@ -29,7 +29,7 @@ export class AuthService {
         return tokens
     }
 
-    async signinLocal(dto: AuthDto): Promise<Tokens> {
+    async  signinLocal(dto: AuthDto): Promise<Tokens> {
         const data = await this.authRepository.createQueryBuilder().where({email: dto.email});
         const userEmail = data.expressionMap.parameters.orm_param_0;
 
@@ -48,15 +48,14 @@ export class AuthService {
     }
 
     async logout(userId: number): Promise<boolean> {
-        await this.authRepository.createQueryBuilder()
+     const log = await this.authRepository.createQueryBuilder()
             .update()
             .set({hashedRt: null})
             .where({
                 id: userId,
-                hashedRt: {not: null}
+                // hashedRt: {not: null}   ,  coś z tym nie działa(?)
             })
             .execute()
-
         return true
     }
 

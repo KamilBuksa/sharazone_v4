@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Delete,
+    Controller,
     HttpCode,
     HttpStatus,
     Post,
@@ -15,8 +15,9 @@ import {AuthService} from "./auth.service";
 import {AuthDto} from "./dto";
 import {Tokens} from "./types";
 import {AuthGuard} from "@nestjs/passport";
-import  {Request} from "express";
+import {Request} from "express";
 import {Auth} from "./entities/auth.entity";
+import {JwtService} from "@nestjs/jwt";
 
 
 @Controller('auth')
@@ -25,6 +26,7 @@ export class AuthController {
         private authService: AuthService,
         @InjectRepository(Auth)
         private readonly authRepository: Repository<Auth>,
+        private readonly jwtService: JwtService
     ) {
     }
 
@@ -43,13 +45,21 @@ export class AuthController {
     }
 
 
-    @UseGuards(AuthGuard('jwt'))
+    // @UseGuards(AuthGuard('jwt'))
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     async logout(@Req() req: Request) {
 
-        // const user = req.user
-        // return await this.authService.logout(user['sub'])
+        const barerToken = req.headers.authorization;
+        const token = barerToken.substring(7, barerToken.length)
+
+        const decoded = this.jwtService.decode(token, {complete: true});
+
+        const payloadSub = decoded['payload'].sub
+        const subToNumber = parseFloat(payloadSub)
+
+        await this.authService.logout(subToNumber)
+
     }
 
 
