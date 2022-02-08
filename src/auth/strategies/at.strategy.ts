@@ -3,6 +3,7 @@ import {PassportStrategy} from "@nestjs/passport";
 import {ExtractJwt, Strategy} from "passport-jwt";
 import {Injectable} from "@nestjs/common";
 
+
 export type JwtPayload = {
     email: string;
     sub: number;
@@ -14,13 +15,20 @@ constructor() {
     super({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: 'at_secret',
-    });
 
+        // ignoreExpiration: false,
+    });
 }
 
 
     validate(payload:JwtPayload){
-        return payload
-}
+        return { sub: payload.sub, email: payload.email };}
+
+
+    // validate(payload:JwtPayload){
+    //     console.log(payload)
+    //     return payload;}
+
+
 
 }

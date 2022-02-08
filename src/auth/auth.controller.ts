@@ -58,8 +58,9 @@ export class AuthController {
         const payloadSub = decoded['payload'].sub
         const subToNumber = parseFloat(payloadSub)
 
-        await this.authService.logout(subToNumber)
-
+        return await this.authService.logout(subToNumber)
+        // console.log(decoded['payload'].email)
+// return {email:decoded['payload'].email,sub:decoded['payload'].sub }
     }
 
 
