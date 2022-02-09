@@ -108,14 +108,4 @@ export class AuthService {
         }
     }
 
-
-//     getPayloadFromToken(@Req() req: Request): any {
-//         this.jwt.signAsync({}, {opts})
-//         const barerToken = req.headers.authorization;
-//         const token = barerToken.substring(7, barerToken.length)
-//
-//         const decoded = this.jwtService.decode(token, {complete: true});
-//         console.log(barerToken)
-//         return decoded
-//     }
 }

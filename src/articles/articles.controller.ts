@@ -34,11 +34,6 @@ export class ArticlesController {
         return this.articlesService.create(createArticleDto)
     }
 
-    // @Patch(':id')
-    // updateArticle(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-    //     console.log('patch in')
-    //     return this.articlesService.update(id, updateArticleDto)
-    // }
 
     @Patch(':id')
     updateArticle(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {

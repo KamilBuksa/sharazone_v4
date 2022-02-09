@@ -18,9 +18,6 @@ constructor() {
     super({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: 'at_secret',
-        // secretOrKey: process.env.ACCESS_SECRET_TOKEN,
-
-        // ignoreExpiration: false,
     });
 }
 
@@ -29,15 +26,5 @@ constructor() {
     validate(payload: JwtPayload) {
         return payload;
     }
-    // async validate(payload:JwtPayload){
-    //     return {sub: payload.sub, email: payload.email };}
-
-
-    // validate(payload:JwtPayload){
-    //     console.log(payload)
-    //     return payload;}
-
-
-
 
 }

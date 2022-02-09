@@ -2,11 +2,8 @@ import {Module} from '@nestjs/common';
 import {ArticlesModule} from './articles/articles.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from './auth/auth.module';
-import {UsersModule} from './users/users.module';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
-import {AtStrategy, RtStrategy} from "./auth/strategies";
-import { PhotosService } from './photos/photos.service';
 import { PhotosModule } from './photos/photos.module';
 
 
@@ -28,13 +25,9 @@ import { PhotosModule } from './photos/photos.module';
                 synchronize: true,
             }),
         }),
-        // ConfigModule,
         AuthModule,
         PhotosModule,
-        // UsersModule
         ],
-    controllers: [],
-    // providers: [AtStrategy,RtStrategy],
 })
 export class AppModule {
 }
