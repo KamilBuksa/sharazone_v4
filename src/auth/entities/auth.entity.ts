@@ -1,6 +1,6 @@
 import {Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 import {IsString} from "class-validator";
-
+//rozdzerzenie klasy Base
 @Entity()
 export class Auth {
     @PrimaryGeneratedColumn({type: 'bigint'})

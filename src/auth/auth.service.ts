@@ -1,4 +1,4 @@
-import {ForbiddenException, Injectable} from '@nestjs/common';
+import {ForbiddenException, Injectable, Req} from '@nestjs/common';
 import {AuthDto} from "./dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Auth} from "./entities/auth.entity";
@@ -6,6 +6,7 @@ import * as argon from 'argon2';
 import {Repository} from "typeorm";
 import {Tokens} from "./types";
 import {JwtService} from "@nestjs/jwt";
+import {Request} from "express";
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
     }
 
     async  signinLocal(dto: AuthDto): Promise<Tokens> {
+        //metoda findUserByEmail
         const data = await this.authRepository.createQueryBuilder().where({email: dto.email});
         const userEmail = data.expressionMap.parameters.orm_param_0;
 
@@ -47,15 +49,21 @@ export class AuthService {
 
     }
 
-    async logout(userId: number): Promise<boolean> {
-     const log = await this.authRepository.createQueryBuilder()
+    async logout(req: Request):Promise<boolean>  {
+        const barerToken = req.headers.authorization;
+        const token = barerToken.substring(7, barerToken.length)
+        const decoded = this.jwtService.decode(token, {complete: true});
+        const payloadSub = decoded['payload'].sub;
+
+      await this.authRepository.createQueryBuilder()
             .update()
             .set({hashedRt: null})
             .where({
-                id: userId,
+                id: payloadSub,
                 // hashedRt: {not: null}   ,  coś z tym nie działa(?)
             })
             .execute()
+
         return true
     }
 
@@ -79,14 +87,16 @@ export class AuthService {
                 sub: userId,
                 email,
             }, {
-                secret: 'at-secret',
+                secret: process.env.REFRESH_SECRET_TOKEN,
+                // secret: 'at-secret',
                 expiresIn: 60 * 15,
             }),
             this.jwtService.signAsync({
                 sub: userId,
                 email,
             }, {
-                secret: 'rt_secret',
+                secret: process.env.REFRESH_SECRET_TOKEN,
+                // secret: 'rt_secret',
                 expiresIn: 60 * 60 * 24 * 7,
             })
 
@@ -99,5 +109,13 @@ export class AuthService {
     }
 
 
-
+//     getPayloadFromToken(@Req() req: Request): any {
+//         this.jwt.signAsync({}, {opts})
+//         const barerToken = req.headers.authorization;
+//         const token = barerToken.substring(7, barerToken.length)
+//
+//         const decoded = this.jwtService.decode(token, {complete: true});
+//         console.log(barerToken)
+//         return decoded
+//     }
 }

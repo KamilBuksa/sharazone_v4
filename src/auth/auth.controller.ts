@@ -45,22 +45,10 @@ export class AuthController {
     }
 
 
-    // @UseGuards(AuthGuard('jwt'))
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     async logout(@Req() req: Request) {
-
-        const barerToken = req.headers.authorization;
-        const token = barerToken.substring(7, barerToken.length)
-
-        const decoded = this.jwtService.decode(token, {complete: true});
-
-        const payloadSub = decoded['payload'].sub
-        const subToNumber = parseFloat(payloadSub)
-
-        return await this.authService.logout(subToNumber)
-        // console.log(decoded['payload'].email)
-// return {email:decoded['payload'].email,sub:decoded['payload'].sub }
+         return  this.authService.logout(req)
     }
 
 

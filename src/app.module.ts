@@ -6,11 +6,12 @@ import {UsersModule} from './users/users.module';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
 import {AtStrategy, RtStrategy} from "./auth/strategies";
+import { PhotosService } from './photos/photos.service';
+import { PhotosModule } from './photos/photos.module';
 
 
 @Module({
     imports: [
-
         ArticlesModule,
         ConfigModule.forRoot({
             load: [appConfig], // 👈
@@ -27,14 +28,14 @@ import {AtStrategy, RtStrategy} from "./auth/strategies";
                 synchronize: true,
             }),
         }),
-        ConfigModule,
+        // ConfigModule,
         AuthModule,
-        UsersModule],
+        PhotosModule,
+        // UsersModule
+        ],
     controllers: [],
-    providers: [AtStrategy,RtStrategy],
+    // providers: [AtStrategy,RtStrategy],
 })
 export class AppModule {
 }
 
-// AuthController, UsersController
-// AuthService, UsersService

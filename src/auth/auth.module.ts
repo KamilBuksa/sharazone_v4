@@ -12,8 +12,16 @@ import {JwtModule} from "@nestjs/jwt";
 @Module({
     imports:[TypeOrmModule.forFeature([User,Auth]), ConfigModule, JwtModule.register({}),],
     controllers: [AuthController],
-    providers: [AuthService,UsersService,AtStrategy,RtStrategy]
+    providers: [AuthService,UsersService,AtStrategy,RtStrategy],
+    exports:[AuthService]
 })
 export class AuthModule {
 
 }
+//rozwiązanie na Repository problem, które mi nie działa
+// {
+//     provide: JwtService,
+//     useValue: {
+//         signAsync: jest.fn(() => 'token'),
+//     }
+// }
