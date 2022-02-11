@@ -7,14 +7,16 @@ import {Repository} from "typeorm";
 import {Tokens} from "./types";
 import {JwtService} from "@nestjs/jwt";
 import {Request} from "express";
+import { AuthRepository } from './auth.repository.service';
 
 @Injectable()
-export class AuthService {
+export class AuthService extends AuthRepository{
     constructor(
         @InjectRepository(Auth)
-        private readonly authRepository: Repository<Auth>,
-        private readonly jwtService: JwtService
+        public  authRepository: Repository<Auth>,
+        public  jwtService: JwtService
     ) {
+        super(authRepository,jwtService)
     }
 
     async signupLocal(dto: AuthDto): Promise<Tokens> {
@@ -50,21 +52,24 @@ export class AuthService {
     }
 
     async logout(req: Request):Promise<boolean>  {
-        const barerToken = req.headers.authorization;
-        const token = barerToken.substring(7, barerToken.length)
-        const decoded = this.jwtService.decode(token, {complete: true});
-        const payloadSub = decoded['payload'].sub;
+       // await this.log(req)
+      //   const barerToken = req.headers.authorization;
+      //   const token = barerToken.substring(7, barerToken.length)
+      //   const decoded = this.jwtService.decode(token, {complete: true});
+      //   const payloadSub = decoded['payload'].sub;
+      //
+      // await this.authRepository.createQueryBuilder()
+      //       .update()
+      //       .set({hashedRt: null})
+      //       .where({
+      //           id: payloadSub,
+      //           // hashedRt: {not: null}   ,  coś z tym nie działa(?)
+      //       })
+      //       .execute()
+      //
+      //   return true
 
-      await this.authRepository.createQueryBuilder()
-            .update()
-            .set({hashedRt: null})
-            .where({
-                id: payloadSub,
-                // hashedRt: {not: null}   ,  coś z tym nie działa(?)
-            })
-            .execute()
-
-        return true
+        return this.log(req)
     }
 
     refreshToken() {

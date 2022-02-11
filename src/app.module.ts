@@ -5,11 +5,11 @@ import {AuthModule} from './auth/auth.module';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
 import { PhotosModule } from './photos/photos.module';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Module({
     imports: [
-        ArticlesModule,
         ConfigModule.forRoot({
             load: [appConfig], // 👈
         }),
@@ -25,6 +25,7 @@ import { PhotosModule } from './photos/photos.module';
                 synchronize: true,
             }),
         }),
+        ArticlesModule,
         AuthModule,
         PhotosModule,
         ],

@@ -7,13 +7,13 @@ import {UsersService} from "../users/users.service";
 import {ConfigModule} from "@nestjs/config";
 import {Auth} from "./entities/auth.entity";
 import {AtStrategy, RtStrategy} from "./strategies";
-import {JwtModule} from "@nestjs/jwt";
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import {AuthRepository} from "./auth.repository.service";
 
 @Module({
-    imports:[TypeOrmModule.forFeature([User,Auth]), ConfigModule, JwtModule.register({}),],
+    imports:[TypeOrmModule.forFeature([User,Auth]), ConfigModule, JwtModule.register({}) ],
     controllers: [AuthController],
-    providers: [AuthService,AuthRepository,UsersService,AtStrategy,RtStrategy],
+    providers: [AuthService,UsersService,AtStrategy,RtStrategy],
 })
 export class AuthModule {
 
