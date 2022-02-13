@@ -1,4 +1,5 @@
-import {Column,Entity,PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auth } from '../../auth/entities/auth.entity';
 
 @Entity()
 export class Article {
@@ -13,4 +14,11 @@ export class Article {
 
     @Column()
     body: string;
+
+    @ManyToOne(
+      () => Auth,
+      (auth) => auth.articles
+    )
+    auth:Auth
+
 }
