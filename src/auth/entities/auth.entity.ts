@@ -33,12 +33,20 @@ export class Auth {
   @Column({ nullable: true })
   hashedRt: string;
 
-@JoinColumn({name:"article"})
-@OneToMany(
-  () => Article,
-  (article) => article.auth,
-  {cascade:true}
-)
-  articles:Article[]
+  @OneToMany(
+    () => Article,
+    (article) => article.auth,
+    // { cascade: true },
+  )
+  articles: Article[];
 
+//   addArticle(article: Article) {
+//     if (this.articles == null) {
+//       this.articles = new Array<Article>();
+//     }
+//     this.articles.push(article);
+//   }
 }
+
+
+

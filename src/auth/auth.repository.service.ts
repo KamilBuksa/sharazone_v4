@@ -63,10 +63,8 @@ export class AuthRepository {
       .set({hashedRt: null})
       .where({
         id: payloadSub,
-        // hashedRt: {not: null}   ,  coś z tym nie działa(?)
       })
       .execute()
-
     return true
   }
 
