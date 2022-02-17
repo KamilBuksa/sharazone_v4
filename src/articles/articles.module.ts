@@ -8,9 +8,21 @@ import { JwtModule } from '@nestjs/jwt';
 import { AtStrategy, RtStrategy } from 'src/auth/strategies';
 import { Auth } from '../auth/entities/auth.entity';
 import { AuthService } from '../auth/auth.service';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Article,Auth]), ConfigModule, JwtModule.register({})],
+    imports: [TypeOrmModule.forFeature([Article,Auth]), ConfigModule, JwtModule.register({}),
+
+        ClientsModule.register([
+            {
+                name: 'PHOTOS',
+                transport: Transport.TCP,
+                options: {
+                    port:3001
+                }
+            }
+        ])
+    ],
     controllers: [ArticlesController],
     providers: [ArticlesService,AuthService, AtStrategy, RtStrategy,]
 })

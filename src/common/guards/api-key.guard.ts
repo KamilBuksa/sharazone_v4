@@ -22,6 +22,8 @@ export class ApiKeyGuard implements CanActivate {
     request.user =payloadSub
 
     //
+
+    //@TODO stworzyć walidację (?)
     // if(request){
     //   request['payload'] = 'some custom value'
     // }

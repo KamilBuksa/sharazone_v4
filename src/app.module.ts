@@ -4,8 +4,8 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {AuthModule} from './auth/auth.module';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import appConfig from './config/app.config';
-import { PhotosModule } from './photos/photos.module';
 import { JwtService } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 
 @Module({
@@ -27,7 +27,15 @@ import { JwtService } from '@nestjs/jwt';
         }),
         ArticlesModule,
         AuthModule,
-        PhotosModule,
+
+      // test
+
+
+
+
+      // test
+
+
         ],
 })
 export class AppModule {

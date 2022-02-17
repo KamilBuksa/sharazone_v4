@@ -18,6 +18,7 @@ import {AuthGuard} from "@nestjs/passport";
 import {Request} from "express";
 import {Auth} from "./entities/auth.entity";
 import {JwtService} from "@nestjs/jwt";
+import { ApiKeyGuard } from '../common/guards/api-key.guard';
 
 
 @Controller('auth')
@@ -37,7 +38,6 @@ export class AuthController {
 
 
     }
-
     @Post('local/signin')
     @HttpCode(HttpStatus.OK)
     signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
