@@ -45,10 +45,10 @@ export class ArticlesService {
         //
 
         //encoded jwt token,
-        const authHeader = req.headers.authorization;
-        const token = authHeader.substring(7, authHeader.length)
-        const decoded = this.jwtService.decode(token, {complete: true});
-        const articleSub = decoded['payload'].sub;
+        // const authHeader = req.headers.authorization;
+        // const token = authHeader.substring(7, authHeader.length)
+        // const decoded = this.jwtService.decode(token, {complete: true});
+        // const articleSub = decoded['payload'].sub;
 
         //take id from sending token with article. Article have id from token, so id will be send to photo that it also have the same id
 
@@ -58,12 +58,30 @@ export class ArticlesService {
 
         //
         const fileData = files[0]
-        this.photosClient.emit({cmd: 'get_photos'}, {fileData,articleId});
+        this.photosClient.emit({cmd: 'get_photos'}, {fileData, articleId});
 
         //@TODO  create article, update dto (lead,body,title)
 
         return articleDate
     }
+
+
+    async remove(id: string) {
+        const article = await this.articleRepository.findOne(id);
+        console.log(article);
+
+        // send article id to the photo app and find aticleId in photo and delete row
+        this.photosClient.emit({cmd: 'delete_photo'}, {id});
+
+        return this.articleRepository.remove(article);
+    }
+
+    downloadPhotoFromArticle(id: string,) {
+        const data = '1asdasdasda'
+        this.photosClient.emit({cmd: 'download_photo'}, {id});
+        return data
+    }
+
 
     createMessage() {
         return this.photosClient.emit({cmd: 'get_photos'}, {});
@@ -104,11 +122,6 @@ export class ArticlesService {
         return this.articleRepository.save(article);
     }
 
-    async remove(id: string) {
-        const article = await this.articleRepository.findOne(id);
-        console.log(article);
-        return this.articleRepository.remove(article);
-    }
 
     async saveAuthId(createArticleDto: CreateArticleDto, auth: Auth) {
         console.log('weszło');

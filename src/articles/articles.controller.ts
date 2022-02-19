@@ -32,8 +32,7 @@ export class ArticlesController {
   }
 
 
-  // TEST2
-  //Guar jest po to by mieć dostęp do req.user i z rozkodowanego tokenu wziąć id, by je przypisać do tabeli article wraz z artykułem
+  //Guard jest po to by mieć dostęp do req.user i z rozkodowanego tokenu wziąć id, by je przypisać do tabeli article wraz z artykułem
   @UseGuards(ApiKeyGuard)
   @Post()
   @UseInterceptors(AnyFilesInterceptor())
@@ -43,10 +42,19 @@ export class ArticlesController {
     @Req() req: Request,
   ) {
    return  this.articlesService.createArticleAndSendPhoto(createArticleDto, files,req);
-
-    // const result = await this.articlesService.create(createArticleDto, req);
-    // return result;
   }
+
+
+  @Delete(':id')
+  deleteArticle(@Param('id') id) {
+    return this.articlesService.remove(id);
+  }
+
+@Get('photo/:id')
+downloadPhotoFromArticle(@Param('id') id){
+  console.log(id)
+    return this.articlesService.downloadPhotoFromArticle(id)
+}
 
   @Post('photo')
   createMessage(@Body() createPhotoRequestDto: CreatePhotoRequestDto) {
@@ -79,10 +87,6 @@ export class ArticlesController {
     return this.articlesService.update(id, updateArticleDto);
   }
 
-  @Delete(':id')
-  deleteArticle(@Param('id') id) {
-    return this.articlesService.remove(id);
-  }
 
 
   // @UseGuards(ApiKeyGuard)
