@@ -6,29 +6,21 @@ import {
   Body,
   Patch,
   Delete,
-  Query, UseGuards, Req, UseInterceptors, UploadedFile, UploadedFiles, Res, Header,
+  Query, UseGuards, Req, UseInterceptors, UploadedFiles, Res,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { Auth } from '../auth/entities/auth.entity';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { Request, Response } from 'express';
-import { JwtService } from '@nestjs/jwt';
-import { CreatePhotoRequestDto } from './create-photo-request-dto';
-import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { createReadStream } from 'fs';
-import { doc } from 'prettier';
-import join = doc.builders.join;
-import { Readable } from 'stream';
-import * as fs from 'fs';
 import {MessagePattern} from "@nestjs/microservices";
 
 @Controller('articles')
 export class ArticlesController {
-  constructor(private readonly articlesService: ArticlesService,
-              protected readonly jwtService: JwtService,
+  constructor(
+      private readonly articlesService: ArticlesService,
   ) {
   }
 
@@ -99,16 +91,8 @@ downloadPhotoFromArticle(@Param('id') id, @Req() req:Request, ){
       @UploadedFiles() files: Array<Express.Multer.File>
               ){
     console.log(id)
-    return this.articlesService.updatePhoto(id,files)
+    return this.articlesService.updatePhoto(+id,files)
   }
-
-  // @UseGuards(ApiKeyGuard)
-  // @Post()
-  // async createArticle(@Body() createArticleDto: CreateArticleDto, @Req() req:Request) {
-  //     console.log(createArticleDto instanceof CreateArticleDto)
-  // const result = await this.articlesService.create(createArticleDto,req)
-  //     return result
-  // }
 
 
 }

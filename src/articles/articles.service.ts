@@ -4,17 +4,10 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Connection, Repository} from 'typeorm';
 import {CreateArticleDto} from './dto/create-article.dto';
 import {UpdateArticleDto} from './dto/update-article.dto';
-import {AuthDto} from '../auth/dto';
 import {Auth} from '../auth/entities/auth.entity';
 import {Express, Request, Response} from 'express';
-import {CreatePhotoEvent} from './create-photo-event';
 import {ClientProxy} from '@nestjs/microservices';
-import {CreatePhotoRequestDto} from './create-photo-request-dto';
-import * as fs from 'fs';
-import {CreateArticleEvent} from './events/create.article.event';
 import {JwtService} from '@nestjs/jwt';
-// const {writeFile} = require('fs').promises
-//@TODO napisac funkcję, w której po podaniu id użytkownia znajdzie wszystkie artykuły przez niego napisane
 @Injectable()
 export class ArticlesService {
 
@@ -46,7 +39,6 @@ export class ArticlesService {
         const fileData = files[0]
         this.photosClient.emit({cmd: 'get_photos'}, {fileData, articleId});
 
-        //@TODO  create article, update dto (lead,body,title)
 
         return articleDate
     }
@@ -67,7 +59,6 @@ export class ArticlesService {
     }
 
     downloadPhotoFromArticle(id: string,) {
-        const data = 'download photo - article service'
        return  this.photosClient.emit({cmd: 'download_photo'}, {id});
     }
 
@@ -77,10 +68,6 @@ export class ArticlesService {
         return pathToDownload
     }
 
-
-
-
-    //
     findAll() {
         return this.articleRepository.find();
     }
@@ -117,41 +104,11 @@ export class ArticlesService {
     }
 
 
-    updatePhoto(id,files: Array<Express.Multer.File>,){
-        console.log(files)
-
+    updatePhoto(id:number,files: Array<Express.Multer.File>,){
         return  this.photosClient.emit({cmd: 'update_photo'}, {id,files});
     }
 
 
-
-    async saveAuthId(createArticleDto: CreateArticleDto, auth: Auth) {
-        console.log('weszło');
-        const {title, lead, body} = createArticleDto;
-
-        console.log('weszło w saveAuth');
-        const newArticleDto = this.articleRepository.create({
-            title,
-            lead,
-            body,
-            auth,
-        });
-
-        console.log(newArticleDto);
-        return this.articleRepository.save(newArticleDto);
-    }
-
-    //na potem, jakbym jednak chciał tworzyć sam artykuł
-    // async create(createArticleDto: CreateArticleDto, req:Request) {
-    //
-    //   const newRecipe =await  this.articleRepository.create({
-    //       ...createArticleDto,
-    //       auth: req.user
-    //     }
-    //
-    //   )
-    //   return this.articleRepository.save(newRecipe)
-    // }
 
 }
 
