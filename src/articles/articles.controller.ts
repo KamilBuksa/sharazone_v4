@@ -6,7 +6,7 @@ import {
   Body,
   Patch,
   Delete,
-  Query, UseGuards, Req, UseInterceptors, UploadedFile, UploadedFiles, Res,
+  Query, UseGuards, Req, UseInterceptors, UploadedFile, UploadedFiles, Res, Header,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -23,6 +23,7 @@ import { doc } from 'prettier';
 import join = doc.builders.join;
 import { Readable } from 'stream';
 import * as fs from 'fs';
+import {MessagePattern} from "@nestjs/microservices";
 
 @Controller('articles')
 export class ArticlesController {
@@ -33,6 +34,7 @@ export class ArticlesController {
 
 
   //Guard jest po to by mieć dostęp do req.user i z rozkodowanego tokenu wziąć id, by je przypisać do tabeli article wraz z artykułem
+  // create article with photo
   @UseGuards(ApiKeyGuard)
   @Post()
   @UseInterceptors(AnyFilesInterceptor())
@@ -44,25 +46,25 @@ export class ArticlesController {
    return  this.articlesService.createArticleAndSendPhoto(createArticleDto, files,req);
   }
 
-
+//delete article and photo
   @Delete(':id')
   deleteArticle(@Param('id') id) {
     return this.articlesService.remove(id);
   }
 
+//  -----------------------------
 @Get('photo/:id')
-downloadPhotoFromArticle(@Param('id') id){
+downloadPhotoFromArticle(@Param('id') id, @Req() req:Request, ){
   console.log(id)
-    return this.articlesService.downloadPhotoFromArticle(id)
+  return this.articlesService.downloadPhotoFromArticle(id, )
 }
 
-  @Post('photo')
-  createMessage(@Body() createPhotoRequestDto: CreatePhotoRequestDto) {
-    this.articlesService.createMessage();
+// get full photo path
+  @MessagePattern({cmd: 'download_photo2'})
+  async downloadPhotoMessage(@Body() body , @Res() res:Response){
+    return this.articlesService.downloadPhotoMessage(body)
   }
-
-  //
-
+  // ----------------------------
 
   @Get()
   findAllArticles(@Query() paginationQuery) {
@@ -75,6 +77,7 @@ downloadPhotoFromArticle(@Param('id') id){
     return this.articlesService.findOne('' + id);
   }
 
+  //if you dont want auth table to be see, just delete relations: ['auth'] in findArticlesWrittenByUser
   @Get('user/:id')
   findArticlesWrittenByUser(@Param('id') id: number) {
     return this.articlesService.findArticlesWrittenByUser(id);
@@ -88,6 +91,16 @@ downloadPhotoFromArticle(@Param('id') id){
   }
 
 
+
+  @Patch('photo/:id')
+  @UseInterceptors(AnyFilesInterceptor())
+  updatePhoto(
+      @Param('id') id:string,
+      @UploadedFiles() files: Array<Express.Multer.File>
+              ){
+    console.log(id)
+    return this.articlesService.updatePhoto(id,files)
+  }
 
   // @UseGuards(ApiKeyGuard)
   // @Post()

@@ -1,6 +1,7 @@
 import {NestFactory, } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {ValidationPipe} from "@nestjs/common";
+import {Transport} from "@nestjs/microservices";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,7 +12,17 @@ async function bootstrap() {
     transform:true,
   }))
 
+  //TEST
+  app.connectMicroservice({
+    transport:Transport.TCP,
+    options:{
+      port:3000
+    }
+  })
+  //TEST
 
+
+  await app.startAllMicroservices()
 
   await app.listen(3000);
 }

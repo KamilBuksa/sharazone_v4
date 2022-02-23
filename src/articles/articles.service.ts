@@ -6,7 +6,7 @@ import {CreateArticleDto} from './dto/create-article.dto';
 import {UpdateArticleDto} from './dto/update-article.dto';
 import {AuthDto} from '../auth/dto';
 import {Auth} from '../auth/entities/auth.entity';
-import {Express, Request} from 'express';
+import {Express, Request, Response} from 'express';
 import {CreatePhotoEvent} from './create-photo-event';
 import {ClientProxy} from '@nestjs/microservices';
 import {CreatePhotoRequestDto} from './create-photo-request-dto';
@@ -42,21 +42,7 @@ export class ArticlesService {
         const articleDate = Object.entries(createArticle);
         const articleId = articleDate[4][1];
 
-        //
 
-        //encoded jwt token,
-        // const authHeader = req.headers.authorization;
-        // const token = authHeader.substring(7, authHeader.length)
-        // const decoded = this.jwtService.decode(token, {complete: true});
-        // const articleSub = decoded['payload'].sub;
-
-        //take id from sending token with article. Article have id from token, so id will be send to photo that it also have the same id
-
-
-        //wywołaj zdarzenie do mikroserwisu gdy user się stworzy,
-        this.photosClient.emit('user_created', new CreateArticleEvent(createArticleDto.title, createArticleDto.lead, createArticleDto.body, articleId));
-
-        //
         const fileData = files[0]
         this.photosClient.emit({cmd: 'get_photos'}, {fileData, articleId});
 
@@ -67,6 +53,7 @@ export class ArticlesService {
 
 
     async remove(id: string) {
+        if (await this.articleRepository.findOne(id)) {
         const article = await this.articleRepository.findOne(id);
         console.log(article);
 
@@ -74,18 +61,24 @@ export class ArticlesService {
         this.photosClient.emit({cmd: 'delete_photo'}, {id});
 
         return this.articleRepository.remove(article);
+        } else {
+            return 'file does not exist'
+        }
     }
 
     downloadPhotoFromArticle(id: string,) {
-        const data = '1asdasdasda'
-        this.photosClient.emit({cmd: 'download_photo'}, {id});
-        return data
+        const data = 'download photo - article service'
+       return  this.photosClient.emit({cmd: 'download_photo'}, {id});
+    }
+
+    downloadPhotoMessage(body) {
+        const pathToDownload = body.pathToDownloadPhoto
+        console.log(pathToDownload)
+        return pathToDownload
     }
 
 
-    createMessage() {
-        return this.photosClient.emit({cmd: 'get_photos'}, {});
-    }
+
 
     //
     findAll() {
@@ -101,6 +94,7 @@ export class ArticlesService {
 
         return article;
     }
+
 
     async findArticlesWrittenByUser(id: number) {
         return this.articleRepository.find({relations: ['auth'], where: {auth: id}});
@@ -121,6 +115,14 @@ export class ArticlesService {
 
         return this.articleRepository.save(article);
     }
+
+
+    updatePhoto(id,files: Array<Express.Multer.File>,){
+        console.log(files)
+
+        return  this.photosClient.emit({cmd: 'update_photo'}, {id,files});
+    }
+
 
 
     async saveAuthId(createArticleDto: CreateArticleDto, auth: Auth) {
