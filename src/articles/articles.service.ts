@@ -23,7 +23,6 @@ export class ArticlesService {
     ) {
     }
 
-    // TEST
     async createArticleAndSendPhoto(createArticleDto: CreateArticleDto, files: Array<Express.Multer.File>, req: Request) {
 
         //create Article and give article Id
@@ -35,12 +34,32 @@ export class ArticlesService {
         const articleDate = Object.entries(createArticle);
         const articleId = articleDate[4][1];
 
-
+//@TODO artykuł ma mieć id zdjęcia, nie przypisywać do zdjęcia id artykułu. Zdjęcie najpierw wysłać. Osobna metoda
         const fileData = files[0]
         this.photosClient.emit({cmd: 'get_photos'}, {fileData, articleId});
 
 
         return articleDate
+    }
+
+    // post photo and send photoId to article v. 12.03.20222
+    async sendPhoto(files,articleId){
+        const fileData = files[0];
+        this.photosClient.emit({cmd: 'save_photo'}, {fileData,articleId});
+    }
+
+    // Add photoId to article table
+    async addPhotoId(body){
+        console.log(body, 'its me photoId - article.service')
+
+        await this.articleRepository.createQueryBuilder()
+            .update()
+            .set({photoId: body.photoId})
+            .where({
+                id: body.articleId,
+            })
+            .execute()
+
     }
 
 

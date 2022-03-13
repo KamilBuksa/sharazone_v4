@@ -33,4 +33,6 @@ export class Article {
     )
     auth:Auth;
 
+    @Column({nullable:true})
+    photoId:number;
 }
