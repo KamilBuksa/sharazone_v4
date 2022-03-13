@@ -8,6 +8,7 @@ import {Auth} from '../auth/entities/auth.entity';
 import {Express, Request, Response} from 'express';
 import {ClientProxy} from '@nestjs/microservices';
 import {JwtService} from '@nestjs/jwt';
+
 @Injectable()
 export class ArticlesService {
 
@@ -23,33 +24,29 @@ export class ArticlesService {
     ) {
     }
 
-    async createArticleAndSendPhoto(createArticleDto: CreateArticleDto, files: Array<Express.Multer.File>, req: Request) {
+
+
+    async createArticle(createArticleDto, req: Request) {
 
         //create Article and give article Id
-        const newRecipe = await this.articleRepository.create({
+        const newRecipe = this.articleRepository.create({
             ...createArticleDto,
             auth: req.user
         })
         const createArticle = await this.articleRepository.save(newRecipe);
-        const articleDate = Object.entries(createArticle);
-        const articleId = articleDate[4][1];
 
-//@TODO artykuł ma mieć id zdjęcia, nie przypisywać do zdjęcia id artykułu. Zdjęcie najpierw wysłać. Osobna metoda
-        const fileData = files[0]
-        this.photosClient.emit({cmd: 'get_photos'}, {fileData, articleId});
-
-
-        return articleDate
+        return createArticle
     }
 
     // post photo and send photoId to article v. 12.03.20222
-    async sendPhoto(files,articleId){
+    async sendPhoto(files, articleId) {
         const fileData = files[0];
-        this.photosClient.emit({cmd: 'save_photo'}, {fileData,articleId});
+        this.photosClient.emit({cmd: 'save_photo'}, {fileData, articleId});
+        return true
     }
 
     // Add photoId to article table
-    async addPhotoId(body){
+    async addPhotoId(body) {
         console.log(body, 'its me photoId - article.service')
 
         await this.articleRepository.createQueryBuilder()
@@ -63,22 +60,33 @@ export class ArticlesService {
     }
 
 
+
     async remove(id: string) {
+        console.log('działa')
         if (await this.articleRepository.findOne(id)) {
-        const article = await this.articleRepository.findOne(id);
-        console.log(article);
+            const article = await this.articleRepository.findOne(id);
+            console.log(article);
 
-        // send article id to the photo app and find aticleId in photo and delete row
-        this.photosClient.emit({cmd: 'delete_photo'}, {id});
 
-        return this.articleRepository.remove(article);
+            if (article.photoId !== null) {
+                // send article id to the photo app and find aticleId in photo and delete row
+                const photoId = article.photoId;
+                console.log('nie null');
+                this.photosClient.emit({cmd: 'delete_photo'}, {photoId});
+            }
+            console.log('return')
+            return this.articleRepository.remove(article);
         } else {
             return 'file does not exist'
         }
     }
 
-    downloadPhotoFromArticle(id: string,) {
-       return  this.photosClient.emit({cmd: 'download_photo'}, {id});
+
+    async downloadPhotoFromArticle(id: string,) {
+        const article = await this.articleRepository.findOne({where: {id: id}});
+        const photoId = article.photoId
+        console.log(photoId)
+        return this.photosClient.emit({cmd: 'download_photo'}, {photoId});
     }
 
     downloadPhotoMessage(body) {
@@ -86,6 +94,7 @@ export class ArticlesService {
         console.log(pathToDownload)
         return pathToDownload
     }
+
 
     findAll() {
         return this.articleRepository.find();
@@ -123,10 +132,14 @@ export class ArticlesService {
     }
 
 
-    updatePhoto(id:number,files: Array<Express.Multer.File>,){
-        return  this.photosClient.emit({cmd: 'update_photo'}, {id,files});
-    }
+    async updatePhoto(id: number, files: Array<Express.Multer.File>,) {
+        const article = await this.articleRepository.findOne({where: {id: id}})
+        const photoId = article.photoId;
+        console.log(article)
+        console.log(photoId)
 
+        return this.photosClient.emit({cmd: 'update_photo'}, {photoId, files});
+    }
 
 
 }
