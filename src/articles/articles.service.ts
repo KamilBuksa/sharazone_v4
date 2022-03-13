@@ -39,14 +39,14 @@ export class ArticlesService {
     }
 
     // post photo and send photoId to article v. 12.03.20222
-    async sendPhoto(files, articleId) {
+    async sendPhoto(files:Array<Express.Multer.File>, articleId:number) {
         const fileData = files[0];
         this.photosClient.emit({cmd: 'save_photo'}, {fileData, articleId});
         return true
     }
 
     // Add photoId to article table
-    async addPhotoId(body) {
+    async addPhotoId(body:any) {
         console.log(body, 'its me photoId - article.service')
 
         await this.articleRepository.createQueryBuilder()
@@ -61,7 +61,7 @@ export class ArticlesService {
 
 
 
-    async remove(id: string) {
+    async remove(id: number) {
         console.log('działa')
         if (await this.articleRepository.findOne(id)) {
             const article = await this.articleRepository.findOne(id);
@@ -74,7 +74,6 @@ export class ArticlesService {
                 console.log('nie null');
                 this.photosClient.emit({cmd: 'delete_photo'}, {photoId});
             }
-            console.log('return')
             return this.articleRepository.remove(article);
         } else {
             return 'file does not exist'
@@ -82,17 +81,17 @@ export class ArticlesService {
     }
 
 
-    async downloadPhotoFromArticle(id: string,) {
+    async downloadPhotoFromArticle(id: number,) {
         const article = await this.articleRepository.findOne({where: {id: id}});
+        console.log(article)
         const photoId = article.photoId
         console.log(photoId)
         return this.photosClient.emit({cmd: 'download_photo'}, {photoId});
     }
 
-    downloadPhotoMessage(body) {
-        const pathToDownload = body.pathToDownloadPhoto
-        console.log(pathToDownload)
-        return pathToDownload
+    downloadPhotoMessage(pathToDownloadPhoto:string) {
+        console.log(pathToDownloadPhoto)
+        return pathToDownloadPhoto
     }
 
 
@@ -100,7 +99,7 @@ export class ArticlesService {
         return this.articleRepository.find();
     }
 
-    async findOne(id: string) {
+    async findOne(id: number) {
         const article = await this.articleRepository.findOne(id);
 
         if (!article) {
@@ -117,7 +116,7 @@ export class ArticlesService {
     }
 
 
-    async update(id: string, updateArticleDto: UpdateArticleDto) {
+    async update(id: number, updateArticleDto: UpdateArticleDto) {
         console.log('update');
         const article = await this.articleRepository.preload({
             id: +id,
@@ -135,7 +134,7 @@ export class ArticlesService {
     async updatePhoto(id: number, files: Array<Express.Multer.File>,) {
         const article = await this.articleRepository.findOne({where: {id: id}})
         const photoId = article.photoId;
-        console.log(article)
+        console.log(files)
         console.log(photoId)
 
         return this.photosClient.emit({cmd: 'update_photo'}, {photoId, files});

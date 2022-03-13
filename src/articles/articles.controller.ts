@@ -45,12 +45,13 @@ export class ArticlesController {
         @Param('id', ParseIntPipe) articleId: number,
         @UploadedFiles() files: Array<Express.Multer.File>,
     ) {
+        console.log('FILES...', files)
         return this.articlesService.sendPhoto(files, articleId);
     }
 
     @MessagePattern({cmd: 'add_photoId'})
     async addPhotoId(
-        @Body() body
+        @Body() body:any,
     ) {
         return this.articlesService.addPhotoId(body)
     }
@@ -58,48 +59,65 @@ export class ArticlesController {
 
 
     @Delete(":id")
-    deleteArticleAndPhoto(@Param("id") id) {
+    deleteArticleAndPhoto(
+        @Param("id",ParseIntPipe) id:number
+    ) {
         return this.articlesService.remove(id);
     }
 
     // ----------------------------
     //  Download photo from article
     @Get(":id/photo")
-    downloadPhotoFromArticle(@Param("id",ParseIntPipe) id, @Req() req: Request) {
+    downloadPhotoFromArticle(
+        @Param("id",ParseIntPipe) id:number,
+        @Req() req: Request,
+    ) {
         console.log(id);
         return this.articlesService.downloadPhotoFromArticle(id);
     }
 
     // get full photo path
     @MessagePattern({cmd: "download_photo2"})
-    async downloadPhotoMessage(@Body() body, @Res() res: Response) {
-        return this.articlesService.downloadPhotoMessage(body);
+    async downloadPhotoMessage(
+        @Body() body: { pathToDownloadPhoto:string },
+        @Res() res: Response
+    ) {
+        return this.articlesService.downloadPhotoMessage(body.pathToDownloadPhoto);
     }
     // ----------------------------
 
 
     @Get()
-    findAllArticles(@Query() paginationQuery) {
+    findAllArticles(
+        @Query() paginationQuery,
+        ) {
         const {limit, offset} = paginationQuery;
         return this.articlesService.findAll();
     }
 
     @Get(":id")
-    findOneArticle(@Param("id") id: number) /* Param domyślnie jest stringiem, transform:true w Pipe umożliwia otypowanie go na number */ {
-        return this.articlesService.findOne("" + id);
+    findOneArticle(
+        @Param("id",ParseIntPipe) id:number,
+    ) /* Param domyślnie jest stringiem, transform:true w Pipe umożliwia otypowanie go na number */ {
+        return this.articlesService.findOne(id);
     }
 
     //if you dont want auth table to be see, just delete relations: ['auth'] in findArticlesWrittenByUser
     //http://localhost:3000/articles/user/17
     @Get("user/:id")
-    findArticlesWrittenByUser(@Param("id") id: number) {
+    findArticlesWrittenByUser(
+        @Param("id",ParseIntPipe) id: number,
+    ) {
         return this.articlesService.findArticlesWrittenByUser(id);
 
     }
 
 
     @Patch(":id")
-    updateArticle(@Param("id") id: string, @Body() updateArticleDto: UpdateArticleDto) {
+    updateArticle(
+        @Param("id",ParseIntPipe) id: number,
+        @Body() updateArticleDto: UpdateArticleDto,
+    ) {
         return this.articlesService.update(id, updateArticleDto);
     }
 
@@ -107,11 +125,11 @@ export class ArticlesController {
     @Patch(":id/photo")
     @UseInterceptors(AnyFilesInterceptor())
     updatePhoto(
-        @Param("id") id: string,
+        @Param("id",ParseIntPipe) id: number,
         @UploadedFiles() files: Array<Express.Multer.File>
     ) {
         console.log(id);
-        return this.articlesService.updatePhoto(+id, files);
+        return this.articlesService.updatePhoto(id, files);
     }
 
 
