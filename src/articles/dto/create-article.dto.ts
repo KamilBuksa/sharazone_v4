@@ -1,4 +1,4 @@
-import {IsString} from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateArticleDto {
 
@@ -10,5 +10,8 @@ export class CreateArticleDto {
 
     @IsString()
     readonly body: string;
+
+    @IsNumber()
+    readonly photoId:number
 
 }

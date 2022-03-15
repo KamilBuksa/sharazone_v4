@@ -21,17 +21,12 @@ export class ApiKeyGuard implements CanActivate {
     const payloadSub = decoded['payload'].sub;
     request.user =payloadSub
 
-    //
 
-    //@TODO stworzyć walidację (?)
-    // if(request){
-    //   request['payload'] = 'some custom value'
-    // }
-    //
-    // console.log(request);
 
-    // return authHeader === process.env.API_KEY;
+    if (token) {
+      return true;
+    }
 
-    return true
+    return false;
   }
 }
